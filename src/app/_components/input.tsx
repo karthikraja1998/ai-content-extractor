@@ -1,23 +1,41 @@
 "use client";
-import React, { useState } from "react";
-const Input = () => {
+import { useState, type FormEvent } from "react";
+import { Search } from "lucide-react";
+interface inputProps {
+  onSubmit: (url: string) => void;
+}
+const Input = ({ onSubmit }: inputProps) => {
   const [URL, setURL] = useState("");
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmit(URL);
+  };
   return (
-    <div className="flex w-full justify-center">
-      <div className="w-1/2">
-        <input
-          type="text"
-          value={URL}
-          onChange={(e) => setURL(e.target.value)}
-          className="h-15 w-full rounded-l-4xl border bg-black px-15 py-5 text-center text-xl text-white transition-all duration-300 hover:border-gray-500 hover:shadow-sm focus:border-gray-500 focus:ring-2 focus:outline-none"
-          placeholder="Enter the URL..."
-        />
-        <h1 className="mt-1 text-center text-xs">
-          Enter the <strong>URL</strong> of the article you want to summarise
-        </h1>
-        <button></button>
+    <>
+      <div className="flex w-full items-center justify-center">
+        <div className="flex w-1/2 items-center justify-center">
+          <form
+            onSubmit={handleSubmit}
+            className="group flex w-full items-center justify-center"
+          >
+            <input
+              type="text"
+              value={URL}
+              onChange={(e) => setURL(e.target.value)}
+              className="h-15 w-full rounded-l-4xl bg-black px-15 py-5 text-center text-xl text-white ring-0 transition-all duration-500 outline-none group-focus-within:border group-focus-within:border-r-0 group-focus-within:border-gray-500 group-focus-within:ring-2 group-hover:border group-hover:border-r-0 group-hover:border-gray-500 group-hover:shadow-sm"
+              placeholder="Enter the URL..."
+            />
+            <button className="h-15 w-auto cursor-pointer rounded-r-4xl bg-black px-5 py-5 text-white ring-0 transition-all duration-500 outline-none group-focus-within:border group-focus-within:border-l-0 group-focus-within:border-gray-500 group-focus-within:ring-2 group-hover:border group-hover:border-l-0 group-hover:border-gray-500 group-hover:shadow-sm">
+              <Search color="gray" size={20} />
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+      <h1 className="mt-1 text-center text-xs">
+        Enter the <strong>public URL</strong> of the article you want to
+        summarise
+      </h1>
+    </>
   );
 };
 
