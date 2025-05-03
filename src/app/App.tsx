@@ -7,7 +7,6 @@ import { TRPCClientError } from "@trpc/client";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import Summary from "./_components/Table";
 import Loader from "./_components/Loader";
-import EmptyState from "./_components/EmptyState";
 
 type dbRes = {
   id?: number;
