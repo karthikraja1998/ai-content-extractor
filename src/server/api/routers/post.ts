@@ -30,7 +30,6 @@ export const postRouter = createTRPCRouter({
             keyPoints: JSON.stringify(keypoints || []),
           },
         });
-
         return await prisma.content.findMany({
           orderBy: { createdAt: "desc" },
         });
@@ -50,12 +49,4 @@ export const postRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
     });
   }),
-  // getDb: publicProcedure
-  //   .input(z.object({ url: z.string() }))
-  //   .query(async ({ input }) => {
-  //     const content = await prisma.content.findUnique({
-  //       where: { url: input.url },
-  //     });
-  //     return content;
-  //   }),
 });
