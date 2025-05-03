@@ -1,15 +1,61 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import axios from "axios";
-
+import cleanArticleContent from "~/server/services/getArticleContent";
+import getArticleSummaries from "~/server/services/getSummaries";
+import { prisma } from "lib/prisma";
+import { TRPCError } from "@trpc/server";
 export const postRouter = createTRPCRouter({
-  get: publicProcedure
-    .input(z.object({ text: z.string() }))
+  getSummary: publicProcedure
+    .input(z.object({ URL: z.string().url() }))
     .mutation(async ({ input }) => {
-      const pageRes = await axios({ url: input.text, method: "get" });
-      console.log("html res", pageRes.data);
-      return {
-        message: `${pageRes.data}`,
-      };
+      try {
+        const pageRes = await axios.get(input.URL);
+
+        const articleContentChunks = await cleanArticleContent(pageRes.data);
+        if (!articleContentChunks.length) {
+          throw new Error("No content extracted");
+        }
+
+        const summaryRes = await getArticleSummaries(articleContentChunks);
+        console.log("🚀 ~ .mutation ~ summaryRes:", summaryRes);
+        const { summary, keypoints } = JSON.parse(summaryRes);
+        console.log(`🚀 ~ .mutation ~ { summary, keypoints }:`, typeof summary);
+        console.log(summary);
+        console.log(summary);
+        await prisma.content.create({
+          data: {
+            url: input.URL,
+            summary: summary,
+            keyPoints: JSON.stringify(keypoints || []),
+          },
+        });
+
+        return await prisma.content.findMany({
+          orderBy: { createdAt: "desc" },
+        });
+      } catch (error) {
+        console.error("Database error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Database operation failed",
+        });
+      }
     }),
+  getAllSummaries: publicProcedure.query(async () => {
+    return prisma.content.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  }),
+  // getDb: publicProcedure
+  //   .input(z.object({ url: z.string() }))
+  //   .query(async ({ input }) => {
+  //     const content = await prisma.content.findUnique({
+  //       where: { url: input.url },
+  //     });
+  //     return content;
+  //   }),
 });
