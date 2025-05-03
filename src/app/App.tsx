@@ -7,11 +7,11 @@ import { ToastContainer, toast, Slide } from "react-toastify";
 import Summary from "./_components/Table";
 
 type dbRes = {
-  id: number;
-  url: string;
-  summary: string;
-  keyPoints: string;
-  createdAt: Date;
+  id?: number;
+  url?: string | null;
+  summary?: string | null;
+  keyPoints?: string | null;
+  createdAt?: string | null;
 };
 export default function App() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,6 +33,7 @@ export default function App() {
 
   const postSummary = api.post.getSummary.useMutation();
   const onSubmit = async (url: string) => {
+    console.log("🚀 ~ onSubmit ~ url:", url);
     try {
       const res: dbRes[] = await postSummary.mutateAsync({ URL: url });
       setSummaryData(res);

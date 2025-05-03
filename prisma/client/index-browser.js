@@ -124,8 +124,8 @@ exports.Prisma.ContentScalarFieldEnum = {
   id: 'id',
   url: 'url',
   summary: 'summary',
-  keypoints: 'keypoints',
-  createdat: 'createdat'
+  keyPoints: 'keyPoints',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -145,7 +145,7 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  content: 'content'
+  Content: 'Content'
 };
 
 /**

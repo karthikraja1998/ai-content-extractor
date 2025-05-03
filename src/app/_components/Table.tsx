@@ -1,12 +1,12 @@
 "use client";
 import { useReactTable } from "@tanstack/react-table";
-interface summary {
-  id: number;
-  url: string;
-  summary: string;
-  keyPoints: string;
-  createdAt: Date;
-}
+type summary = {
+  id?: number;
+  url?: string | null;
+  summary?: string | null;
+  keyPoints?: string | null;
+  createdAt?: string | null;
+};
 type TableSummary = {
   url: string;
   summary: string;
