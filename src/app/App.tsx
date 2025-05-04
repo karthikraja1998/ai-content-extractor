@@ -36,7 +36,6 @@ export default function App() {
 
   const postSummary = api.post.getSummary.useMutation();
   const onSubmit = async (url: string) => {
-    console.log("🚀 ~ onSubmit ~ url:", url);
     try {
       setLoader(true);
       const res: dbRes[] = await postSummary.mutateAsync({ URL: url });

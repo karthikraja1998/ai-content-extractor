@@ -11,18 +11,13 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       try {
         const pageRes = await axios.get(input.URL);
-
         const articleContentChunks = await cleanArticleContent(pageRes.data);
         if (!articleContentChunks.length) {
           throw new Error("No content extracted");
         }
-
         const summaryRes = await getArticleSummaries(articleContentChunks);
         console.log("🚀 ~ .mutation ~ summaryRes:", summaryRes);
         const { summary, keypoints } = JSON.parse(summaryRes);
-        console.log(`🚀 ~ .mutation ~ { summary, keypoints }:`, typeof summary);
-        console.log(summary);
-        console.log(summary);
         await prisma.content.create({
           data: {
             url: input.URL,
@@ -45,8 +40,17 @@ export const postRouter = createTRPCRouter({
       }
     }),
   getAllSummaries: publicProcedure.query(async () => {
-    return prisma.content.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    try {
+      return prisma.content.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (error) {
+      console.error("Error in Prisma: Error fetching data", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message:
+          error instanceof Error ? error.message : "Database operation failed",
+      });
+    }
   }),
 });

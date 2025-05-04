@@ -149,7 +149,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
+    "rootEnvPath": "../../.env",
     "schemaEnvPath": "../../.env"
   },
   "relativePath": "..",
@@ -168,8 +168,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Content {\n  id        Int      @id @default(autoincrement())\n  url       String   @unique\n  summary   String?\n  keyPoints String?\n  createdAt DateTime @default(now())\n}\n",
-  "inlineSchemaHash": "86da34d98b750c26e005cd6e002e57a42fc84face32369f34e916afb407360d2",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"client\"\n}\n\ndatasource db {\n  provider     = \"postgresql\"\n  url          = env(\"DATABASE_URL\")\n  relationMode = \"prisma\"\n}\n\nmodel Content {\n  id        Int      @id @default(autoincrement())\n  url       String   @unique\n  summary   String?\n  keyPoints String?\n  createdAt DateTime @default(now())\n}\n",
+  "inlineSchemaHash": "02458a547686a698f2f0eeb046f993b4691f97a52c85eb5236ea396b47d72732",
   "copyEngine": true
 }
 
