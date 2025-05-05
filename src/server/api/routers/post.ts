@@ -5,6 +5,13 @@ import cleanArticleContent from "~/server/services/getArticleContent";
 import getArticleSummaries from "~/server/services/getSummaries";
 import { prisma } from "lib/prisma";
 import { TRPCError } from "@trpc/server";
+type dbRes = {
+  id: number;
+  url: string;
+  summary: string;
+  keyPoints: string;
+  createdAt: Date;
+};
 export const postRouter = createTRPCRouter({
   getSummary: publicProcedure
     .input(z.object({ URL: z.string().url() }))
@@ -25,9 +32,10 @@ export const postRouter = createTRPCRouter({
             keyPoints: JSON.stringify(keypoints || []),
           },
         });
-        return await prisma.content.findMany({
+        const contents: dbRes[] = await prisma.content.findMany({
           orderBy: { createdAt: "desc" },
         });
+        return contents;
       } catch (error) {
         console.error("Database error:", error);
         throw new TRPCError({
@@ -41,9 +49,10 @@ export const postRouter = createTRPCRouter({
     }),
   getAllSummaries: publicProcedure.query(async () => {
     try {
-      return prisma.content.findMany({
+      const contents: dbRes[] = await prisma.content.findMany({
         orderBy: { createdAt: "desc" },
       });
+      return contents;
     } catch (error) {
       console.error("Error in Prisma: Error fetching data", error);
       throw new TRPCError({

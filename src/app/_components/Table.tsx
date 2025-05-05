@@ -9,9 +9,9 @@ import {
 } from "@tanstack/react-table";
 type summary = {
   id?: number;
-  url?: string | null;
-  summary?: string | null;
-  keyPoints?: string | null;
+  url?: string;
+  summary?: string;
+  keyPoints?: string;
   createdAt?: Date;
 };
 export default function Summary({ data }: { data: summary[] }) {

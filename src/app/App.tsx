@@ -10,9 +10,9 @@ import Loader from "./_components/Loader";
 
 type dbRes = {
   id?: number;
-  url?: string | null;
-  summary?: string | null;
-  keyPoints?: string | null;
+  url?: string;
+  summary?: string;
+  keyPoints?: string;
   createdAt?: Date;
 };
 export default function App() {
