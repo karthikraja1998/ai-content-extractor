@@ -9,7 +9,9 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     GEMINI_APIKEY: z.string(),
-    NODE_ENV: z.enum(["development", "test", "production"]),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
   },
 
   /**

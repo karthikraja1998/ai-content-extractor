@@ -1,15 +1,18 @@
 import { z } from "zod";
+
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { content } from "~/server/db/schema";
+import { db } from "~/server/db";
 import axios from "axios";
 import cleanArticleContent from "~/server/services/getArticleContent";
 import getArticleSummaries from "~/server/services/getSummaries";
-import { prisma } from "lib/prisma";
 import { TRPCError } from "@trpc/server";
+import { desc } from "drizzle-orm";
 type dbRes = {
   id: number;
   url: string;
-  summary: string;
-  keyPoints: string;
+  summary: string | null;
+  keyPoints: string | null;
   createdAt: Date;
 };
 export const postRouter = createTRPCRouter({
@@ -25,16 +28,16 @@ export const postRouter = createTRPCRouter({
         const summaryRes = await getArticleSummaries(articleContentChunks);
         console.log("🚀 ~ .mutation ~ summaryRes:", summaryRes);
         const { summary, keypoints } = JSON.parse(summaryRes);
-        await prisma.content.create({
-          data: {
-            url: input.URL,
-            summary: summary,
-            keyPoints: JSON.stringify(keypoints || []),
-          },
+        await db.insert(content).values({
+          url: input.URL,
+          summary: summary,
+          keyPoints: JSON.stringify(keypoints || []),
         });
-        const contents: dbRes[] = await prisma.content.findMany({
-          orderBy: { createdAt: "desc" },
-        });
+
+        const contents: dbRes[] = await db
+          .select()
+          .from(content)
+          .orderBy(desc(content.createdAt));
         return contents;
       } catch (error) {
         console.error("Database error:", error);
@@ -49,9 +52,10 @@ export const postRouter = createTRPCRouter({
     }),
   getAllSummaries: publicProcedure.query(async () => {
     try {
-      const contents: dbRes[] = await prisma.content.findMany({
-        orderBy: { createdAt: "desc" },
-      });
+      const contents: dbRes[] = await db
+        .select()
+        .from(content)
+        .orderBy(desc(content.createdAt));
       return contents;
     } catch (error) {
       console.error("Error in Prisma: Error fetching data", error);

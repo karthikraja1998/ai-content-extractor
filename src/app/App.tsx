@@ -10,10 +10,10 @@ import Loader from "./_components/Loader";
 
 type dbRes = {
   id?: number;
-  url?: string;
-  summary?: string;
-  keyPoints?: string;
-  createdAt?: Date;
+  url?: string | null;
+  summary?: string | null;
+  keyPoints?: string | null;
+  createdAt?: Date | null;
 };
 export default function App() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,7 +32,7 @@ export default function App() {
           createdAt:
             item.createdAt && !isNaN(new Date(item.createdAt).getTime())
               ? new Date(item.createdAt)
-              : new Date(),
+              : null,
         })),
       );
     } else if (isDbError) {

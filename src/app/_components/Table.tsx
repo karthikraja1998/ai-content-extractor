@@ -6,13 +6,15 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   flexRender,
+  type HeaderGroup,
+  type Header,
 } from "@tanstack/react-table";
 type summary = {
   id?: number;
-  url?: string;
-  summary?: string;
-  keyPoints?: string;
-  createdAt?: Date;
+  url?: string | null;
+  summary?: string | null;
+  keyPoints?: string | null;
+  createdAt?: Date | null;
 };
 export default function Summary({ data }: { data: summary[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
@@ -64,7 +66,25 @@ export default function Summary({ data }: { data: summary[] }) {
     ],
     [data],
   );
-  const table = useReactTable({
+  interface TableState {
+    globalFilter: string;
+  }
+
+  interface TableOptions<T> {
+    data: T[];
+    columns: any[];
+    state: TableState;
+    getCoreRowModel: () => any;
+    getFilteredRowModel: () => any;
+    getSortedRowModel: () => any;
+    globalFilterFn: (
+      row: any,
+      columnId: string,
+      filterValue: string,
+    ) => boolean;
+  }
+
+  const table = useReactTable<summary>({
     data: data,
     columns,
     state: {
@@ -73,31 +93,62 @@ export default function Summary({ data }: { data: summary[] }) {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: (row, columnId, filterValue) => {
+    globalFilterFn: (
+      row: any,
+      columnId: string,
+      filterValue: string,
+    ): boolean => {
       return String(row.getValue(columnId))
         .toLowerCase()
         .includes(filterValue.toLowerCase());
     },
-  });
+  } as TableOptions<summary>);
   return (
     <div className="p-4">
       <table className="min-w-full rounded-2xl border">
         <thead className="">
-          {table.getHeaderGroups().map((headerGroup) => (
+          {table.getHeaderGroups().map((headerGroup: HeaderGroup<summary>) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className={`border px-3 py-2 text-left ${header.column.id === "url" ? "w-[300px] max-w-[400px] break-words" : ""}`}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </th>
-              ))}
+              {headerGroup.headers.map((header: Header<summary, unknown>) => {
+                interface HeaderContext {
+                  table: any;
+                  header: Header;
+                  column: Column;
+                }
+
+                interface Column {
+                  id: string;
+                  columnDef: {
+                    header: React.ReactNode;
+                  };
+                }
+
+                interface Header {
+                  id: string;
+                  isPlaceholder: boolean;
+                  column: Column;
+                  getContext: () => HeaderContext;
+                }
+
+                interface HeaderGroup {
+                  id: string;
+                  headers: Header[];
+                }
+
+                return (
+                  <th
+                    key={header.id}
+                    className={`border px-3 py-2 text-left ${header.column.id === "url" ? "w-[300px] max-w-[400px] break-words" : ""}`}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </th>
+                );
+              })}
             </tr>
           ))}
         </thead>
