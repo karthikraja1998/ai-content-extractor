@@ -12,7 +12,7 @@ type summary = {
   url?: string | null;
   summary?: string | null;
   keyPoints?: string | null;
-  createdAt?: string | Date | null;
+  createdAt?: Date;
 };
 export default function Summary({ data }: { data: summary[] }) {
   const [globalFilter, setGlobalFilter] = useState("");

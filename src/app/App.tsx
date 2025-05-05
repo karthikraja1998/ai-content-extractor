@@ -1,6 +1,6 @@
 "use client";
 import { api } from "~/trpc/react";
-import Input from "./_components/input";
+import Input from "./_components/Input";
 import Header from "./_components/Header";
 import { useState, useEffect } from "react";
 import { TRPCClientError } from "@trpc/client";
@@ -13,7 +13,7 @@ type dbRes = {
   url?: string | null;
   summary?: string | null;
   keyPoints?: string | null;
-  createdAt?: string | null | Date;
+  createdAt?: Date;
 };
 export default function App() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -26,7 +26,15 @@ export default function App() {
   } = api.post.getAllSummaries.useQuery();
   useEffect(() => {
     if (summaryFromDb) {
-      setSummaryData(summaryFromDb);
+      setSummaryData(
+        summaryFromDb.map((item) => ({
+          ...item,
+          createdAt:
+            item.createdAt && !isNaN(new Date(item.createdAt).getTime())
+              ? new Date(item.createdAt)
+              : new Date(),
+        })),
+      );
     } else if (isDbError) {
       setErrorMessage("Error fetching summary history from DB");
     }
@@ -38,8 +46,13 @@ export default function App() {
   const onSubmit = async (url: string) => {
     try {
       setLoader(true);
-      const res: dbRes[] = await postSummary.mutateAsync({ URL: url });
-      setSummaryData(res);
+      const res = await postSummary.mutateAsync({ URL: url });
+      setSummaryData(
+        res.map((item) => ({
+          ...item,
+          createdAt: item.createdAt ? new Date(item.createdAt) : null,
+        })),
+      );
       setErrorMessage("");
     } catch (err) {
       const errMessage =
