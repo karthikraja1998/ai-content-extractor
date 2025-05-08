@@ -9,6 +9,7 @@ import {
   type HeaderGroup,
   type Header,
 } from "@tanstack/react-table";
+import Searchbar from "./Searchbar";
 type summary = {
   id?: number;
   url?: string | null;
@@ -16,9 +17,9 @@ type summary = {
   keyPoints?: string | null;
   createdAt?: Date | null;
 };
+
 export default function Summary({ data }: { data: summary[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
-
   const columns = useMemo(
     () => [
       {
@@ -57,19 +58,15 @@ export default function Summary({ data }: { data: summary[] }) {
         accessorKey: "createdAt",
         cell: ({ getValue }: { getValue: any }) => {
           let createdAt = new Date(getValue()).toLocaleDateString();
-          if (createdAt) {
-            return createdAt;
-          }
-          return "Invalid Date";
+          return createdAt || "Invalid Date";
         },
       },
     ],
-    [data],
+    [],
   );
   interface TableState {
     globalFilter: string;
   }
-
   interface TableOptions<T> {
     data: T[];
     columns: any[];
@@ -83,7 +80,6 @@ export default function Summary({ data }: { data: summary[] }) {
       filterValue: string,
     ) => boolean;
   }
-
   const table = useReactTable<summary>({
     data: data,
     columns,
@@ -93,18 +89,18 @@ export default function Summary({ data }: { data: summary[] }) {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: (
-      row: any,
-      columnId: string,
-      filterValue: string,
-    ): boolean => {
-      return String(row.getValue(columnId))
-        .toLowerCase()
-        .includes(filterValue.toLowerCase());
-    },
   } as TableOptions<summary>);
+  const filteredRows = table.getFilteredRowModel().rows;
+  const rowsToDisplay =
+    globalFilter.trim() === "" || filteredRows.length > 0
+      ? filteredRows
+      : table.getCoreRowModel().rows;
   return (
     <div className="p-4">
+      <Searchbar
+        onGlobalFilterChange={setGlobalFilter}
+        globalFilter={globalFilter}
+      />
       <table className="min-w-full rounded-2xl border">
         <thead className="">
           {table.getHeaderGroups().map((headerGroup: HeaderGroup<summary>) => (
@@ -115,26 +111,22 @@ export default function Summary({ data }: { data: summary[] }) {
                   header: Header;
                   column: Column;
                 }
-
                 interface Column {
                   id: string;
                   columnDef: {
                     header: React.ReactNode;
                   };
                 }
-
                 interface Header {
                   id: string;
                   isPlaceholder: boolean;
                   column: Column;
                   getContext: () => HeaderContext;
                 }
-
                 interface HeaderGroup {
                   id: string;
                   headers: Header[];
                 }
-
                 return (
                   <th
                     key={header.id}
@@ -153,7 +145,7 @@ export default function Summary({ data }: { data: summary[] }) {
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
+          {rowsToDisplay.map((row) => (
             <tr key={row.id} className="border-t">
               {row.getVisibleCells().map((cell) => (
                 <td

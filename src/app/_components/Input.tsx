@@ -1,15 +1,25 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { Search } from "lucide-react";
+import { Slide, toast, ToastContainer } from "react-toastify";
 interface inputProps {
   onSubmit: (url: string) => void;
 }
 const Input = ({ onSubmit }: inputProps) => {
+  const [errorMessage, setErrorMessage] = useState("");
   const [URL, setURL] = useState("");
+  const notify = () => toast.error(errorMessage);
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!URL) {
+      setErrorMessage("Enter the URL before searching");
+      notify();
+      return;
+    }
     onSubmit(URL);
   };
+
   return (
     <>
       <div className="flex w-full items-center justify-center">
@@ -29,6 +39,7 @@ const Input = ({ onSubmit }: inputProps) => {
               <Search color="gray" size={20} />
             </button>
           </form>
+          {errorMessage && <ToastContainer theme="dark" transition={Slide} />}
         </div>
       </div>
       <h1 className="mt-1 text-center text-xs">
