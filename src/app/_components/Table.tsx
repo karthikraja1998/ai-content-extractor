@@ -96,12 +96,12 @@ export default function Summary({ data }: { data: summary[] }) {
       ? filteredRows
       : table.getCoreRowModel().rows;
   return (
-    <div className="p-4">
+    <div className="w-full overflow-x-auto p-4">
       <Searchbar
         onGlobalFilterChange={setGlobalFilter}
         globalFilter={globalFilter}
       />
-      <table className="min-w-full rounded-2xl border">
+      <table className="rounded-2xl border">
         <thead className="">
           {table.getHeaderGroups().map((headerGroup: HeaderGroup<summary>) => (
             <tr key={headerGroup.id}>
@@ -130,7 +130,7 @@ export default function Summary({ data }: { data: summary[] }) {
                 return (
                   <th
                     key={header.id}
-                    className={`border px-3 py-2 text-left ${header.column.id === "url" ? "w-[300px] max-w-[400px] break-words" : ""}`}
+                    className={`border px-3 py-2 text-left ${header.column.id === "url" ? "w-48 max-w-full break-words" : ""}`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -150,7 +150,7 @@ export default function Summary({ data }: { data: summary[] }) {
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className={`border px-3 py-2 align-top ${cell.column.id === "url" ? "w-[300px] max-w-[400px] break-words" : ""}`}
+                  className={`border px-3 py-2 align-top ${cell.column.id === "url" ? "w-48 max-w-full break-words" : ""}`}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
