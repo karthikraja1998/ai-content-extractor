@@ -1,3 +1,5 @@
+import React from "react";
+
 const Searchbar = ({
   onGlobalFilterChange,
   globalFilter,
@@ -5,7 +7,6 @@ const Searchbar = ({
   onGlobalFilterChange: (filter: string) => void;
   globalFilter: string;
 }) => {
-  console.log("where am i rendering?");
   return (
     <div>
       <input

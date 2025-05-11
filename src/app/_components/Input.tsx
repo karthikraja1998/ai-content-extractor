@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import React, { useState, type FormEvent } from "react";
 import { Search } from "lucide-react";
 import { Slide, toast, ToastContainer } from "react-toastify";
 interface inputProps {
@@ -12,12 +12,13 @@ const Input = ({ onSubmit }: inputProps) => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!URL) {
+    if (URL) {
+      onSubmit(URL);
+    } else {
       setErrorMessage("Enter the URL before searching");
       notify();
       return;
     }
-    onSubmit(URL);
   };
 
   return (
@@ -26,6 +27,7 @@ const Input = ({ onSubmit }: inputProps) => {
         <div className="flex w-1/2 items-center justify-center">
           <form
             onSubmit={handleSubmit}
+            aria-label="URL submission form"
             className="group flex w-full items-center justify-center"
           >
             <input
@@ -35,7 +37,10 @@ const Input = ({ onSubmit }: inputProps) => {
               className="h-15 w-full rounded-l-4xl bg-black px-15 py-5 text-center text-xl text-white ring-0 transition-all duration-500 outline-none group-focus-within:border group-focus-within:border-r-0 group-focus-within:border-gray-500 group-focus-within:ring-2 group-hover:border group-hover:border-r-0 group-hover:border-gray-500 group-hover:shadow-sm"
               placeholder="Enter the URL..."
             />
-            <button className="h-15 w-auto cursor-pointer rounded-r-4xl bg-black px-5 py-5 text-white ring-0 transition-all duration-500 outline-none group-focus-within:border group-focus-within:border-l-0 group-focus-within:border-gray-500 group-focus-within:ring-2 group-hover:border group-hover:border-l-0 group-hover:border-gray-500 group-hover:shadow-sm">
+            <button
+              type="submit"
+              className="h-15 w-auto cursor-pointer rounded-r-4xl bg-black px-5 py-5 text-white ring-0 transition-all duration-500 outline-none group-focus-within:border group-focus-within:border-l-0 group-focus-within:border-gray-500 group-focus-within:ring-2 group-hover:border group-hover:border-l-0 group-hover:border-gray-500 group-hover:shadow-sm"
+            >
               <Search color="gray" size={20} />
             </button>
           </form>

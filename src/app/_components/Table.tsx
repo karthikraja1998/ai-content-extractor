@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -123,10 +123,6 @@ export default function Summary({ data }: { data: summary[] }) {
                   column: Column;
                   getContext: () => HeaderContext;
                 }
-                interface HeaderGroup {
-                  id: string;
-                  headers: Header[];
-                }
                 return (
                   <th
                     key={header.id}
@@ -145,18 +141,26 @@ export default function Summary({ data }: { data: summary[] }) {
           ))}
         </thead>
         <tbody>
-          {rowsToDisplay.map((row) => (
-            <tr key={row.id} className="border-t">
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className={`border px-3 py-2 align-top ${cell.column.id === "url" ? "w-48 max-w-full break-words" : ""}`}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+          {rowsToDisplay.length === 0 ? (
+            <tr>
+              <td colSpan={4} className="border px-3 py-2 text-center">
+                No data available
+              </td>
             </tr>
-          ))}
+          ) : (
+            rowsToDisplay.map((row) => (
+              <tr key={row.id} className="border-t">
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className={`border px-3 py-2 align-top ${cell.column.id === "url" ? "w-48 max-w-full break-words" : ""}`}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

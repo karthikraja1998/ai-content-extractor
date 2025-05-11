@@ -27,7 +27,7 @@ export const postRouter = createTRPCRouter({
         }
         const summaryRes = await getArticleSummaries(articleContentChunks);
         console.log("🚀 ~ .mutation ~ summaryRes:", summaryRes);
-        const { summary, keypoints } = JSON.parse(summaryRes);
+        const { summary, keypoints } = summaryRes;
         await db.insert(content).values({
           url: input.URL,
           summary: summary,

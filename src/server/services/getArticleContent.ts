@@ -1,8 +1,10 @@
+/**
+ * @jest-environment node
+ */
 import * as cheerio from "cheerio";
 import type { AnyNode } from "domhandler";
 
 export default function cleanArticleContent(HTML: string): Promise<string[]> {
-  console.log("original content length is ", HTML.length);
   const $ = cheerio.load(HTML);
   let content = "";
   $(
@@ -12,22 +14,42 @@ export default function cleanArticleContent(HTML: string): Promise<string[]> {
     (i: number, elem: AnyNode) => {
       const element = $(elem);
       const text = element.text().trim();
-      const textLength = text.length;
-      const links = element.find("a").length;
-      const linkDensity = links / textLength;
-      if (textLength < 40 || linkDensity > 0.2) return;
-      if (text) {
-        content += text + "\n\n";
-      }
+      const paragraphs = text.split(/\n+/); // Split text into individual paragraphs
+
+      paragraphs.forEach((paragraph) => {
+        const trimmedParagraph = paragraph.trim();
+        const textLength = trimmedParagraph.replace(/\s+/g, "").length; // Exclude whitespace from length calculation
+        const wordCount = trimmedParagraph.split(/\s+/).length; // Count words
+        const links = element.find("a").length;
+        const linkDensity = links / textLength;
+
+        console.log(`Processing paragraph: "${trimmedParagraph}"`);
+        console.log(
+          `Text length: ${textLength}, Word count: ${wordCount}, Link density: ${linkDensity}`,
+        );
+
+        // Adjusted filters
+        if ((textLength < 40 && wordCount < 5) || linkDensity > 0.1) {
+          console.log("Excluding paragraph based on filters.");
+          return;
+        }
+
+        if (trimmedParagraph) {
+          content += trimmedParagraph + "\n\n";
+        }
+      });
     },
   );
+  if (!content.trim()) {
+    return Promise.resolve([""]);
+  }
   content = content
     .replace(/\s+/g, " ")
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/\n+/g, "\\n")
+    .replace(/\n+/g, "\n")
     .trim();
-  console.log("Final content length is:", content.length);
+
   return splitIntoChunks(content, 8000);
 }
 
@@ -39,16 +61,21 @@ const splitIntoChunks = async (text: string, charLimit: number) => {
     if (end >= text.length) {
       end = text.length;
     } else {
-      while (end < text.length && text[end] !== "\n" && text[end] !== ".") {
-        end++;
+      let foundSplitPoint = false;
+      while (end > start && text[end] !== "\n" && text[end] !== ".") {
+        end--;
+        if (end - start <= charLimit * 0.8) {
+          // Prevent excessive shrinking
+          foundSplitPoint = true;
+          break;
+        }
       }
-      if (end === text.length) {
-        end = text.length;
+      if (!foundSplitPoint) {
+        end = start + charLimit; // Force split if no suitable point is found
       }
     }
-    chunks.push(text.slice(start, end + 1));
-    start = end + 1;
+    chunks.push(text.slice(start, end).trim());
+    start = end;
   }
-  console.log("🚀 ~ splitIntoChunks ~ chunks:", chunks);
   return chunks;
 };
