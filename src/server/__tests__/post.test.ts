@@ -66,7 +66,10 @@ describe("postRouter", () => {
         data: "<html>content</html>",
       });
       (cleanArticleContent as jest.Mock).mockResolvedValue(mockArticleContent);
-      (getArticleSummaries as jest.Mock).mockResolvedValue(mockSummaryResponse);
+      (getArticleSummaries as jest.Mock).mockResolvedValue({
+        summary: "This is a summary",
+        keypoints: ["Key point 1", "Key point 2"],
+      });
 
       const result = await callerInstance.getSummary({ URL: mockURL });
 

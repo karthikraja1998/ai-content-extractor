@@ -106,16 +106,13 @@ You will need to set the following environment variables for the application to 
     - Create a `drizzle.config.ts` file in the root of your project:
 
       ```typescript
-      import { env } from "~/env";
       import { type Config } from "drizzle-kit";
+
+      import { env } from "~/env";
 
       export default {
         schema: "./src/server/db/schema.ts",
-        dialect: "postgresql",
-        driver: "pg",
-        dbCredentials: {
-          url: env.DATABASE_URL,
-        },
+        connectionString: env.DATABASE_URL,
         tablesFilter: ["ai-content-extractor_*"],
       } satisfies Config;
       ```
